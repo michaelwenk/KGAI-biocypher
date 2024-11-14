@@ -7,8 +7,32 @@ from biocypher._logger import logger
 
 logger.debug(f"Loading module {__name__}.")
 
+class NodeLabel(Enum):
+    """
+    Define node labels for the adapter.
+    """
 
-class ExampleAdapterNodeType(Enum):
+    DATASET = "dataset"
+    # CREATIVE_WORK = "creativeWork"
+    DATA_CATALOG = "dataCatalog"
+
+class NodePropertyLabel(Enum):
+    """
+    Define property labels for the adapter.
+    """
+
+    ID = "id"
+    DESCRIPTION = "description"
+    CONFORMS_TO = "http://purl.org/dc/terms/conformsTo"
+    IDENTIFIER = "identifier"
+    NAME = "name"
+    LICENSE = "license"
+    URL = "url"
+    DATE_PUBLISHED = "datePublished"
+    CITATION = "citation"
+    INCLUDED_IN_DATA_CATALOG = "includedInDataCatalog"
+
+class NodeType(Enum):
     """
     Define types of nodes the adapter can provide.
     """
@@ -19,33 +43,26 @@ class ExampleAdapterNodeType(Enum):
     DATA_CATALOG = auto()
 
 
-class ExampleAdapterDatasetField(Enum):
+class DatasetField(Enum):
     """
     Define possible fields the adapter can provide for datasets.
     """
 
-    ID = "id"    
-    DESCRIPTION = "description"
-    # CONFORMS_TO = "conformsTo"
-    IDENTIFIER = "identifier"
-    NAME = "name"
+    ID = NodePropertyLabel.ID.value   
+    DESCRIPTION = NodePropertyLabel.DESCRIPTION.value
+    CONFORMS_TO = NodePropertyLabel.CONFORMS_TO.value
+    IDENTIFIER = NodePropertyLabel.IDENTIFIER.value
+    NAME = NodePropertyLabel.NAME.value
     # KEYWORDS = "keywords"
-    LICENSE = "license"
-    URL = "url"
-    DATE_PUBLISHED = "datePublished"
-    CITATION = "citation"
+    LICENSE = NodePropertyLabel.LICENSE.value
+    URL = NodePropertyLabel.URL.value
+    DATE_PUBLISHED =NodePropertyLabel.DATE_PUBLISHED.value
+    CITATION = NodePropertyLabel.CITATION.value
     # MEASUREMENT_TECHNIQUE = "measurementTechnique"
     # INCLUDED_IN_DATA_CATALOG = "includedinDataCatalog"
 
 
-class ExampleAdapterCreativeWorkField(Enum):
-    """
-    Define possible fields the adapter can provide for creative work.
-    """
-
-    ID = "id"
-
-class ExampleAdapterDataCatalogField(Enum):
+class DataCatalogField(Enum):
     """
     Define possible fields the adapter can provide for data catalogs.
     """
@@ -53,7 +70,7 @@ class ExampleAdapterDataCatalogField(Enum):
     NAME = "name"
     URL = "url"
 
-class ExampleAdapterEdgeType(Enum):
+class EdgeType(Enum):
     """
     Enum for the types of edges.
     """
@@ -63,7 +80,7 @@ class ExampleAdapterEdgeType(Enum):
 
 
 
-class ExampleAdapter:
+class MassBankAdapter:
     """
     Example BioCypher adapter. Generates nodes and edges for creating a
     knowledge graph.
@@ -88,7 +105,7 @@ class ExampleAdapter:
 
     def get_nodes(self):
         for node in self.nodes:
-            yield (node.get_id(), node.get_label(), {})
+            yield (node.get_id(), node.get_label(), node.get_fields())
 
     def get_edges(self):
         relationship_id = generate_id()
@@ -118,7 +135,7 @@ class ExampleAdapter:
         if node_types:
             self.node_types = node_types
         else:
-            self.node_types = [type for type in ExampleAdapterNodeType]
+            self.node_types = [type for type in NodeType]
 
         if node_fields:
             self.node_fields = node_fields
@@ -126,15 +143,15 @@ class ExampleAdapter:
             self.node_fields = [
                 field
                 for field in chain(
-                    ExampleAdapterDatasetField,
-                    ExampleAdapterCreativeWorkField,
+                    DatasetField,
+                    DataCatalogField,
                 )
             ]
 
         if edge_types:
             self.edge_types = edge_types
         else:
-            self.edge_types = [type for type in ExampleAdapterEdgeType]
+            self.edge_types = [type for type in EdgeType]
 
         if edge_fields:
             self.edge_fields = edge_fields
@@ -145,42 +162,28 @@ class ExampleAdapter:
             self.data = data
         else:
             self.data = None
-        
+
         self.nodes = []
         self.edges = []
         if self.data:
             for item in self.data:
                 if item["@type"] == "Dataset":
-                    dataset_node = Node(label="dataset", fields=[
-                        # field.value for field in ExampleAdapterDatasetField
-                        ])
-                    self.nodes.append(dataset_node)
-                    # if "http://purl.org/dc/terms/conformsTo" in item and item["http://purl.org/dc/terms/conformsTo"]["@type"] == "CreativeWork":
-                    #     creativeWork_node = Node(label="creativeWork", fields=[
-                    #         # field.value for field in ExampleAdapterCreativeWorkField
-                    #         ])
-                    #     self.nodes.append(creativeWork_node)
-                    #     self.edges.append(Edge(
-                    #         parent_node=dataset_node,
-                    #         child_node=creativeWork_node,
-                    #         type=ExampleAdapterEdgeType.DATASET_CREATIVE_WORK_EDGE,
-                    #         fields=[
-                    #             # field.value for field in ExampleAdapterDatasetDatasetEdgeField
-                    #         ],
-                    #     ))
-                    if "includedInDataCatalog" in item and item["includedInDataCatalog"]["@type"] == "DataCatalog":
-                        dataCatalog_node = Node(label="dataCatalog", fields=[
-                            # field.value for field in ExampleAdapterCreativeWorkField
-                            ])
+                    dataset_node = Node(label=NodeLabel.DATASET.value, 
+                                        # fields={}
+                                        )      
+                    self.nodes.append(dataset_node)              
+                    if DatasetField.CONFORMS_TO.value in item and item[DatasetField.CONFORMS_TO.value]["@type"] == "CreativeWork":                       
+                        dataset_node.set_field("conformsTo", item[DatasetField.CONFORMS_TO.value]["@id"])
+
+                    if NodePropertyLabel.INCLUDED_IN_DATA_CATALOG.value in item and item[NodePropertyLabel.INCLUDED_IN_DATA_CATALOG.value]["@type"] == "DataCatalog":
+                        dataCatalog_node = Node(label=NodeLabel.DATA_CATALOG.value, fields={})
                         self.nodes.append(dataCatalog_node)
                         self.edges.append(Edge(
                             parent_node=dataset_node,
                             child_node=dataCatalog_node,
-                            type=ExampleAdapterEdgeType.DATASET_DATA_CATALOG_EDGE.value,
-                            fields=[
-                                # field.value for field in ExampleAdapterDatasetDatasetEdgeField
-                            ],
-                        ))         
+                            type=EdgeType.DATASET_DATA_CATALOG_EDGE.value,
+                            # fields={},
+                        ))   
         
 
 class Node:
@@ -188,7 +191,7 @@ class Node:
     Base class for nodes.
     """
 
-    def __init__(self, label, fields: Optional[list] = None):
+    def __init__(self, label, fields: Optional[dict] = None):
         self.id = generate_id()
         self.label = label
         self.fields = fields              
@@ -211,12 +214,20 @@ class Node:
         """
         return self.fields
     
+    def set_field(self, field, value):
+        """
+        Sets a field value.
+        """
+        if not self.fields:
+            self.fields = {}
+        self.fields[field] = value
+    
 class Edge:
     """
     Base class for edges.
     """
 
-    def __init__(self, type, parent_node, child_node, fields: Optional[list] = None):
+    def __init__(self, type, parent_node, child_node, fields: Optional[dict] = None):
         self.id = generate_id()
         self.type = type
         self.parent_node = parent_node
@@ -252,6 +263,12 @@ class Edge:
         Returns the edge fields.
         """
         return self.fields
+    
+    def set_field(self, field, value):
+        """
+        Sets a field value.
+        """
+        self.fields[field] = value
 
 
 #################

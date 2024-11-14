@@ -1,22 +1,10 @@
 # add your desired knowledge graph components here
 
 dataset:
-  #   is_a: dataset
   represented_as: node
   input_label: dataset
-#   properties:
-#     name: str[]
-#     weight: float
-
-creative work:
-  is_a: creativeWork
-  represented_as: node
-  input_label: creativeWork
-
-# conforms to:
-#   is_a: "http://purl.org/dc/terms/conformsTo"
-#   represented_as: edge
-#   input_label: dataset_creativeWork_association
+  properties:
+    conformsTo: str
 
 data catalog:
   is_a: dataCatalog
@@ -25,6 +13,5 @@ data catalog:
 
 dataset to data catalog edge:
   is_a: [includedInDataCatalog, thing]
-  #   is_a: includedInDataCatalog
   represented_as: edge
   input_label: dataset_dataCatalog_edge
