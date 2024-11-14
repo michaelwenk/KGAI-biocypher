@@ -5,6 +5,10 @@ biocypher:
   debug: false
   schema_config_path: config/schema_config.yaml
   cache_directory: .cache
+  head_ontology:
+    url: data/schemaorg-current-http_edited.rdf
+    root_node: thing
+    format: rdf
 
 neo4j:
   delimiter: '\t'

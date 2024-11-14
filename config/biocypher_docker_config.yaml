@@ -4,13 +4,17 @@ biocypher:
   offline: true
   debug: false
   schema_config_path: config/schema_config.yaml
+  head_ontology:
+    url: data/schemaorg-current-http_edited.rdf
+    root_node: thing
+    format: rdf
   output_directory: data/build2neo
 
 neo4j:
   database_name: neo4j
   wipe: true
   delimiter: '\t'
-  array_delimiter: '|'
+  array_delimiter: "|"
   skip_duplicate_nodes: true
   skip_bad_relationships: true
   import_call_file_prefix: /data/build2neo

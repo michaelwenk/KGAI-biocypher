@@ -1,62 +1,61 @@
-from biocypher import BioCypher, Resource
+
+from biocypher import BioCypher
 from template_package.adapters.example_adapter import (
-    ExampleAdapter,
-    ExampleAdapterNodeType,
-    ExampleAdapterEdgeType,
-    ExampleAdapterProteinField,
-    ExampleAdapterDiseaseField,
+    ExampleAdapter
 )
+import json
+from rdflib import Graph
+
+
+def js_r(filename: str):
+    with open(filename) as f_in:
+        return json.load(f_in)
+    
+data = js_r("data/schema.org.jsonld")
+for item in data["@graph"]:
+    if item["@type"] == "rdfs:Class" and "rdfs:label" in item and isinstance(item["rdfs:label"], str):
+        value = item["rdfs:label"]
+        print(value)        
+        value = value[0].lower() + value[1:]
+        
+        item["rdfs:label"] = value
+        print("--> ", value)
+        print("\n\n")
+
+
+
+
+g = Graph()
+g.parse(data=json.dumps(data), format="json-ld")
+print(len(g))
+
+for item in g.all_nodes():
+    print(item)
+
+g.serialize("data/schemaorg-current-http_edited.rdf", format="xml")
+
+
+
+def js_r(filename: str):
+    with open(filename) as f_in:
+        return json.load(f_in)
+    
+data = js_r("data/test_MB3.jsonld")
 
 # Instantiate the BioCypher interface
 # You can use `config/biocypher_config.yaml` to configure the framework or
 # supply settings via parameters below
 bc = BioCypher()
 
-# Download and cache resources (change the directory in the options if needed)
-urls = "https://file-examples.com/wp-content/storage/2017/02/file_example_CSV_5000.csv"
-resource = Resource(
-    name="Example resource",  # Name of the resource
-    url_s=urls,  # URL to the resource(s)
-    lifetime=7,  # seven days cache lifetime
-)
-paths = bc.download(resource)  # Downloads to '.cache' by default
-print(paths)
-# You can use the list of paths returned to read the resource into your adapter
-
-# Choose node types to include in the knowledge graph.
-# These are defined in the adapter (`adapter.py`).
-node_types = [
-    ExampleAdapterNodeType.PROTEIN,
-    ExampleAdapterNodeType.DISEASE,
-]
-
-# Choose protein adapter fields to include in the knowledge graph.
-# These are defined in the adapter (`adapter.py`).
-node_fields = [
-    # Proteins
-    ExampleAdapterProteinField.ID,
-    ExampleAdapterProteinField.SEQUENCE,
-    ExampleAdapterProteinField.DESCRIPTION,
-    ExampleAdapterProteinField.TAXON,
-    # Diseases
-    ExampleAdapterDiseaseField.ID,
-    ExampleAdapterDiseaseField.NAME,
-    ExampleAdapterDiseaseField.DESCRIPTION,
-]
-
-edge_types = [
-    ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION,
-    ExampleAdapterEdgeType.PROTEIN_DISEASE_ASSOCIATION,
-]
-
 # Create a protein adapter instance
-adapter = ExampleAdapter(
-    node_types=node_types,
-    node_fields=node_fields,
-    edge_types=edge_types,
-    # we can leave edge fields empty, defaulting to all fields in the adapter
-)
+adapter = ExampleAdapter(data=data)
 
+print(adapter.get_node_count())
+for node in adapter.get_nodes():
+    print(node)
+print(adapter.get_edge_count())
+for edge in adapter.get_edges():
+    print(edge)
 
 # Create a knowledge graph from the adapter
 bc.write_nodes(adapter.get_nodes())
@@ -66,4 +65,10 @@ bc.write_edges(adapter.get_edges())
 bc.write_import_call()
 
 # Print summary
+bc.show_ontology_structure(full=True)
+
 bc.summary()
+
+
+
+

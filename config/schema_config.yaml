@@ -1,21 +1,30 @@
 # add your desired knowledge graph components here
 
-protein:
-    represented_as: node
-    preferred_id: uniprot
-    input_label: uniprot_protein
+dataset:
+  #   is_a: dataset
+  represented_as: node
+  input_label: dataset
+#   properties:
+#     name: str[]
+#     weight: float
 
-disease:
-    represented_as: node
-    preferred_id: doid
-    input_label: do_disease
+creative work:
+  is_a: creativeWork
+  represented_as: node
+  input_label: creativeWork
 
-protein interaction:
-    is_a: pairwise molecular interaction
-    represented_as: edge
-    input_label: protein_protein_interaction
+# conforms to:
+#   is_a: "http://purl.org/dc/terms/conformsTo"
+#   represented_as: edge
+#   input_label: dataset_creativeWork_association
 
-protein to disease association:
-    is_a: association
-    represented_as: edge
-    input_label: protein_disease_association
+data catalog:
+  is_a: dataCatalog
+  represented_as: node
+  input_label: dataCatalog
+
+dataset to data catalog edge:
+  is_a: [includedInDataCatalog, thing]
+  #   is_a: includedInDataCatalog
+  represented_as: edge
+  input_label: dataset_dataCatalog_edge

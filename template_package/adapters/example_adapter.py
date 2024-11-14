@@ -13,56 +13,54 @@ class ExampleAdapterNodeType(Enum):
     Define types of nodes the adapter can provide.
     """
 
-    PROTEIN = auto()
-    DISEASE = auto()
+    DATASET = auto()
+    # CHEMICAL_SUBSTANCE = auto()
+    CREATIVE_WORK = auto()
+    DATA_CATALOG = auto()
 
 
-class ExampleAdapterProteinField(Enum):
+class ExampleAdapterDatasetField(Enum):
     """
-    Define possible fields the adapter can provide for proteins.
+    Define possible fields the adapter can provide for datasets.
     """
 
-    ID = "id"
-    SEQUENCE = "sequence"
+    ID = "id"    
     DESCRIPTION = "description"
-    TAXON = "taxon"
-
-
-class ExampleAdapterDiseaseField(Enum):
-    """
-    Define possible fields the adapter can provide for diseases.
-    """
-
-    ID = "id"
+    # CONFORMS_TO = "conformsTo"
+    IDENTIFIER = "identifier"
     NAME = "name"
-    DESCRIPTION = "description"
+    # KEYWORDS = "keywords"
+    LICENSE = "license"
+    URL = "url"
+    DATE_PUBLISHED = "datePublished"
+    CITATION = "citation"
+    # MEASUREMENT_TECHNIQUE = "measurementTechnique"
+    # INCLUDED_IN_DATA_CATALOG = "includedinDataCatalog"
 
+
+class ExampleAdapterCreativeWorkField(Enum):
+    """
+    Define possible fields the adapter can provide for creative work.
+    """
+
+    ID = "id"
+
+class ExampleAdapterDataCatalogField(Enum):
+    """
+    Define possible fields the adapter can provide for data catalogs.
+    """
+
+    NAME = "name"
+    URL = "url"
 
 class ExampleAdapterEdgeType(Enum):
     """
-    Enum for the types of the protein adapter.
+    Enum for the types of edges.
     """
 
-    PROTEIN_PROTEIN_INTERACTION = "protein_protein_interaction"
-    PROTEIN_DISEASE_ASSOCIATION = "protein_disease_association"
+    DATASET_CREATIVE_WORK_EDGE = "dataset_creativeWork_edge"
+    DATASET_DATA_CATALOG_EDGE = "dataset_dataCatalog_edge"
 
-
-class ExampleAdapterProteinProteinEdgeField(Enum):
-    """
-    Define possible fields the adapter can provide for protein-protein edges.
-    """
-
-    INTERACTION_TYPE = "interaction_type"
-    INTERACTION_SOURCE = "interaction_source"
-
-
-class ExampleAdapterProteinDiseaseEdgeField(Enum):
-    """
-    Define possible fields the adapter can provide for protein-disease edges.
-    """
-
-    ASSOCIATION_TYPE = "association_type"
-    ASSOCIATION_SOURCE = "association_source"
 
 
 class ExampleAdapter:
@@ -75,6 +73,7 @@ class ExampleAdapter:
         node_fields: List of node fields to include in the result.
         edge_types: List of edge types to include in the result.
         edge_fields: List of edge fields to include in the result.
+        data: Data to use for generating nodes and edges.
     """
 
     def __init__(
@@ -83,84 +82,39 @@ class ExampleAdapter:
         node_fields: Optional[list] = None,
         edge_types: Optional[list] = None,
         edge_fields: Optional[list] = None,
+        data: Optional[dict] = None,
     ):
-        self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
+        self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields, data)
 
     def get_nodes(self):
-        """
-        Returns a generator of node tuples for node types specified in the
-        adapter constructor.
-        """
-
-        logger.info("Generating nodes.")
-
-        self.nodes = []
-
-        if ExampleAdapterNodeType.PROTEIN in self.node_types:
-            [self.nodes.append(Protein(fields=self.node_fields)) for _ in range(100)]
-
-        if ExampleAdapterNodeType.DISEASE in self.node_types:
-            [self.nodes.append(Disease(fields=self.node_fields)) for _ in range(100)]
-
         for node in self.nodes:
-            yield (node.get_id(), node.get_label(), node.get_properties())
+            yield (node.get_id(), node.get_label(), {})
 
-    def get_edges(self, probability: float = 0.3):
-        """
-        Returns a generator of edge tuples for edge types specified in the
-        adapter constructor.
+    def get_edges(self):
+        relationship_id = generate_id()
 
-        Args:
-            probability: Probability of generating an edge between two nodes.
-        """
-
-        logger.info("Generating edges.")
-
-        if not self.nodes:
-            raise ValueError("No nodes found. Please run get_nodes() first.")
-
-        for node in self.nodes:
-            if random.random() < probability:
-                other_node = random.choice(self.nodes)
-
-                # generate random relationship id by choosing upper or lower
-                # letters and integers, length 10, and joining them
-                relationship_id = "".join(
-                    random.choice(string.ascii_letters + string.digits)
-                    for _ in range(10)
-                )
-
-                # determine type of edge from other_node type
-                if (
-                    isinstance(other_node, Protein)
-                    and ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION
-                    in self.edge_types
-                ):
-                    edge_type = ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION.value
-                elif (
-                    isinstance(other_node, Disease)
-                    and ExampleAdapterEdgeType.PROTEIN_DISEASE_ASSOCIATION
-                    in self.edge_types
-                ):
-                    edge_type = ExampleAdapterEdgeType.PROTEIN_DISEASE_ASSOCIATION.value
-                else:
-                    continue
-
-                yield (
-                    relationship_id,
-                    node.get_id(),
-                    other_node.get_id(),
-                    edge_type,
-                    {"example_property": "example_value"},
-                )
+        for edge in self.edges:
+            yield (
+                relationship_id,
+                edge.parent_node.get_id(),
+                edge.child_node.get_id(),
+                edge.type,
+                {},
+            )
 
     def get_node_count(self):
         """
         Returns the number of nodes generated by the adapter.
         """
-        return len(list(self.get_nodes()))
+        return len(self.nodes)
+    
+    def get_edge_count(self):
+        """
+        Returns the number of edges generated by the adapter.
+        """
+        return len(self.edges)
 
-    def _set_types_and_fields(self, node_types, node_fields, edge_types, edge_fields):
+    def _set_types_and_fields(self, node_types, node_fields, edge_types, edge_fields, data):
         if node_types:
             self.node_types = node_types
         else:
@@ -172,8 +126,8 @@ class ExampleAdapter:
             self.node_fields = [
                 field
                 for field in chain(
-                    ExampleAdapterProteinField,
-                    ExampleAdapterDiseaseField,
+                    ExampleAdapterDatasetField,
+                    ExampleAdapterCreativeWorkField,
                 )
             ]
 
@@ -186,124 +140,123 @@ class ExampleAdapter:
             self.edge_fields = edge_fields
         else:
             self.edge_fields = [field for field in chain()]
-
+        
+        if data:
+            self.data = data
+        else:
+            self.data = None
+        
+        self.nodes = []
+        self.edges = []
+        if self.data:
+            for item in self.data:
+                if item["@type"] == "Dataset":
+                    dataset_node = Node(label="dataset", fields=[
+                        # field.value for field in ExampleAdapterDatasetField
+                        ])
+                    self.nodes.append(dataset_node)
+                    # if "http://purl.org/dc/terms/conformsTo" in item and item["http://purl.org/dc/terms/conformsTo"]["@type"] == "CreativeWork":
+                    #     creativeWork_node = Node(label="creativeWork", fields=[
+                    #         # field.value for field in ExampleAdapterCreativeWorkField
+                    #         ])
+                    #     self.nodes.append(creativeWork_node)
+                    #     self.edges.append(Edge(
+                    #         parent_node=dataset_node,
+                    #         child_node=creativeWork_node,
+                    #         type=ExampleAdapterEdgeType.DATASET_CREATIVE_WORK_EDGE,
+                    #         fields=[
+                    #             # field.value for field in ExampleAdapterDatasetDatasetEdgeField
+                    #         ],
+                    #     ))
+                    if "includedInDataCatalog" in item and item["includedInDataCatalog"]["@type"] == "DataCatalog":
+                        dataCatalog_node = Node(label="dataCatalog", fields=[
+                            # field.value for field in ExampleAdapterCreativeWorkField
+                            ])
+                        self.nodes.append(dataCatalog_node)
+                        self.edges.append(Edge(
+                            parent_node=dataset_node,
+                            child_node=dataCatalog_node,
+                            type=ExampleAdapterEdgeType.DATASET_DATA_CATALOG_EDGE.value,
+                            fields=[
+                                # field.value for field in ExampleAdapterDatasetDatasetEdgeField
+                            ],
+                        ))         
+        
 
 class Node:
     """
     Base class for nodes.
     """
 
-    def __init__(self):
-        self.id = None
-        self.label = None
-        self.properties = {}
+    def __init__(self, label, fields: Optional[list] = None):
+        self.id = generate_id()
+        self.label = label
+        self.fields = fields              
 
     def get_id(self):
         """
         Returns the node id.
         """
         return self.id
-
+    
     def get_label(self):
         """
         Returns the node label.
         """
         return self.label
-
-    def get_properties(self):
+    
+    def get_fields(self):
         """
-        Returns the node properties.
+        Returns the node fields.
         """
-        return self.properties
-
-
-class Protein(Node):
+        return self.fields
+    
+class Edge:
     """
-    Generates instances of proteins.
+    Base class for edges.
     """
 
-    def __init__(self, fields: Optional[list] = None):
+    def __init__(self, type, parent_node, child_node, fields: Optional[list] = None):
+        self.id = generate_id()
+        self.type = type
+        self.parent_node = parent_node
+        self.child_node = child_node
         self.fields = fields
-        self.id = self._generate_id()
-        self.label = "uniprot_protein"
-        self.properties = self._generate_properties()
 
-    def _generate_id(self):
+    def get_id(self):
         """
-        Generate a random UniProt-style id.
+        Returns the edge id.
         """
-        lets = [random.choice(string.ascii_uppercase) for _ in range(3)]
-        nums = [random.choice(string.digits) for _ in range(3)]
-
-        # join alternating between lets and nums
-        return "".join([x for y in zip(lets, nums) for x in y])
-
-    def _generate_properties(self):
-        properties = {}
-
-        ## random amino acid sequence
-        if (
-            self.fields is not None
-            and ExampleAdapterProteinField.SEQUENCE in self.fields
-        ):
-            # random int between 50 and 250
-            l = random.randint(50, 250)
-
-            properties["sequence"] = "".join(
-                [random.choice("ACDEFGHIKLMNPQRSTVWY") for _ in range(l)],
-            )
-
-        ## random description
-        if (
-            self.fields is not None
-            and ExampleAdapterProteinField.DESCRIPTION in self.fields
-        ):
-            properties["description"] = " ".join(
-                [random.choice(string.ascii_lowercase) for _ in range(10)],
-            )
-
-        ## taxon
-        if self.fields is not None and ExampleAdapterProteinField.TAXON in self.fields:
-            properties["taxon"] = "9606"
-
-        return properties
-
-
-class Disease(Node):
-    """
-    Generates instances of diseases.
-    """
-
-    def __init__(self, fields: Optional[list] = None):
-        self.fields = fields
-        self.id = self._generate_id()
-        self.label = "do_disease"
-        self.properties = self._generate_properties()
-
-    def _generate_id(self):
+        return self.id
+    
+    def get_type(self):
         """
-        Generate a random disease id.
+        Returns the edge type.
         """
-        nums = [random.choice(string.digits) for _ in range(8)]
+        return self.type
+    
+    def get_parent_node(self):
+        """
+        Returns the parent node.
+        """
+        return self.parent_node
+    
+    def get_child_node(self):
+        """
+        Returns the child node.
+        """
+        return self.child_node
+    
+    def get_fields(self):
+        """
+        Returns the edge fields.
+        """
+        return self.fields
 
-        return f"DOID:{''.join(nums)}"
 
-    def _generate_properties(self):
-        properties = {}
+#################
 
-        ## random name
-        if self.fields is not None and ExampleAdapterDiseaseField.NAME in self.fields:
-            properties["name"] = " ".join(
-                [random.choice(string.ascii_lowercase) for _ in range(10)],
-            )
-
-        ## random description
-        if (
-            self.fields is not None
-            and ExampleAdapterDiseaseField.DESCRIPTION in self.fields
-        ):
-            properties["description"] = " ".join(
-                [random.choice(string.ascii_lowercase) for _ in range(10)],
-            )
-
-        return properties
+def generate_id():
+    return "".join(                
+        random.choice(string.ascii_letters + string.digits) for _ in range(10)
+    )

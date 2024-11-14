@@ -1,0 +1,55 @@
+[
+    {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "http://purl.org/dc/terms/conformsTo":
+        {
+            "@type": "CreativeWork",
+            "@id": "https://bioschemas.org/profiles/Dataset/1.0-RELEASE"
+        },
+        "@id": "https://massbank.eu/MassBank/RecordDisplay?id=MSBNK-AAFC-AC000114#Dataset",
+        "description": "This MassBank record with Accession MSBNK-AAFC-AC000114 contains the MS2 mass spectrum of Deoxynivalenol with the InChIkey LINOMUASTDIRTM-QGRHZQQGSA-N.",
+        "identifier": "MSBNK-AAFC-AC000114",
+        "name": "Deoxynivalenol; LC-ESI-ITFT; MS2; CE: 50; R=17500; [M+H]+",
+        "keywords":
+        [
+            {
+                "@type": "DefinedTerm",
+                "name": "Mass spectrometry data",
+                "url": "http://edamontology.org/data_2536",
+                "termCode": "data_2536",
+                "inDefinedTermSet":
+                {
+                    "@type": "DefinedTermSet",
+                    "name": "Bioinformatics operations, data types, formats, identifiers and topics",
+                    "url": "http://edamontology.org"
+                }
+            }
+        ],
+        "license": "https://creativecommons.org/licenses/by-sa/4.0",
+        "url": "https://massbank.eu/MassBank/RecordDisplay?id=MSBNK-AAFC-AC000114",
+        "datePublished": "2017-07-07",
+        "citation": "Renaud, J. B.; Sumarah, M. W. Data Independent Acquisition-Digital Archiving Mass Spectrometry: Application to Single Kernel Mycotoxin Analysis of Fusarium Graminearum Infected Maize. Analytical and Bioanalytical Chemistry 2016, 408 (12), 3083–91. DOI:10.1007/s00216-016-9391-5",
+        "measurementTechnique":
+        [
+            {
+                "@type": "DefinedTerm",
+                "name": "liquid chromatography-mass spectrometry",
+                "url": "http://purl.obolibrary.org/obo/CHMO_0000524",
+                "termCode": "CHMO_0000524",
+                "inDefinedTermSet":
+                {
+                    "@type": "DefinedTermSet",
+                    "name": "Chemical Methods Ontology",
+                    "url": "http://purl.obolibrary.org/obo/chmo.owl"
+                }
+            }
+        ],
+        "includedInDataCatalog":
+        {
+            "@type": "DataCatalog",
+            "name": "MassBank",
+            "url": "https://massbank.eu"
+        }
+    }
+]
