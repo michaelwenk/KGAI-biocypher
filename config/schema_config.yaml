@@ -1,17 +1,114 @@
-# add your desired knowledge graph components here
-
+# DATASET SCHEMA CONFIGURATION
 dataset:
   represented_as: node
   input_label: dataset
   properties:
-    conformsTo: str
+    id: str
+    description: str
+    identifier: str
+    name: str
+    license: str
+    url: str
+    datePublished: str
+    citation: str
+
+creative work:
+  is_a: creativeWork
+  represented_as: node
+  input_label: creativeWork
+  properties:
+    id: str
+
+dataset to creative work edge:
+  is_a: [creativeWork, dataset]
+  represented_as: edge
+  input_label: dataset_creativeWork_edge
+
+defined term:
+  is_a: definedTerm
+  represented_as: node
+  input_label: definedTerm
+  properties:
+    name: str
+    url: str
+    termCode: str
+
+defined term set:
+  is_a: definedTermSet
+  represented_as: node
+  input_label: definedTermSet
+  properties:
+    name: str
+    url: str
+
+dataset to defined term edge:
+  #measurementTechnique:
+  is_a: [measurementTechnique, dataset]
+  represented_as: edge
+  input_label: dataset_definedTerm_edge
+
+defined term to defined term set edge:
+  is_a: [inDefinedTermSet, definedTerm]
+  represented_as: edge
+  input_label: definedTerm_definedTermSet_edge
 
 data catalog:
   is_a: dataCatalog
   represented_as: node
   input_label: dataCatalog
+  properties:
+    name: str
+    url: str
 
 dataset to data catalog edge:
-  is_a: [includedInDataCatalog, thing]
+  is_a: [includedInDataCatalog, dataset]
   represented_as: edge
   input_label: dataset_dataCatalog_edge
+
+chemical substance:
+  is_a: chemicalSubstance
+  represented_as: node
+  input_label: chemicalSubstance
+  properties:
+    id: str
+    identifier: str
+    name: str
+    url: str
+    chemicalComposition: str
+    alternateName: [str]
+
+chemical substance to creative work edge:
+  is_a: [creativeWork, chemicalSubstance]
+  represented_as: edge
+  input_label: chemicalSubstance_creativeWork_edge
+
+molecular entity:
+  is_a: molecularEntity
+  represented_as: node
+  input_label: molecularEntity
+  properties:
+    id: str
+    identifier: str
+    name: str
+    url: str
+    smiles: str
+    inchi: str
+    inchiKey: str
+    molecularformula: str
+    monoisotopicMolecularWeight: float
+    description: str
+
+chemical substance to molecular entity edge:
+  is_a: [molecularEntity, chemicalSubstance]
+  represented_as: edge
+  input_label: chemicalSubstance_molecularEntity_edge
+
+dataset to chemical substance edge:
+  is_a: [chemicalSubstance, dataset]
+  represented_as: edge
+  input_label: dataset_chemicalSubstance_edge
+
+chemical substance to dataset edge:
+  is_a: [chemicalSubstance, dataset]
+  represented_as: edge
+  input_label: chemicalSubstance_dataset_edge

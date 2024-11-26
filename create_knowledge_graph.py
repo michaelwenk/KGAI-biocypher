@@ -34,11 +34,11 @@ bc = BioCypher()
 adapter = MassBankAdapter(data=data)
 
 print(adapter.get_node_count())
-for node in adapter.get_nodes():
-    print(node)
+# for node in adapter.get_nodes():
+#     print(node)
 print(adapter.get_edge_count())
-for edge in adapter.get_edges():
-    print(edge)
+# for edge in adapter.get_edges():
+#     print(edge)
 
 # Create a knowledge graph from the adapter
 bc.write_nodes(adapter.get_nodes())

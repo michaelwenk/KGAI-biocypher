@@ -50,6 +50,59 @@
             "@type": "DataCatalog",
             "name": "MassBank",
             "url": "https://massbank.eu"
+        },
+        "about":
+        {
+            "@context": "https://schema.org",
+            "@type": "ChemicalSubstance",
+            "@id": "https://massbank.eu/MassBank/RecordDisplay?id=MSBNK-AAFC-AC000114#ChemicalSubstance"
+        }
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "ChemicalSubstance",
+        "http://purl.org/dc/terms/conformsTo":
+        {
+            "@type": "CreativeWork",
+            "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE"
+        },
+        "@id": "https://massbank.eu/MassBank/RecordDisplay?id=MSBNK-AAFC-AC000114#ChemicalSubstance",
+        "identifier": "MSBNK-AAFC-AC000114",
+        "name": "Deoxynivalenol",
+        "url": "https://massbank.eu/MassBank/RecordDisplay?id=MSBNK-AAFC-AC000114",
+        "chemicalComposition": "C15H20O6",
+        "alternateName":
+        [
+            "Deoxynivalenol",
+            "Vomitoxin",
+            "12,13-Epoxy-3-alpha,7-alpha,15-trihydroxy-9-trichothecen-8-one"
+        ],
+        "hasBioChemEntityPart":
+        [
+            {
+                "@context": "https://schema.org",
+                "@type": "MolecularEntity",
+                "http://purl.org/dc/terms/conformsTo":
+                {
+                    "@type": "CreativeWork",
+                    "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE"
+                },
+                "@id": "https://massbank.eu/MassBank/RecordDisplay?id=MSBNK-AAFC-AC000114#LINOMUASTDIRTM-QGRHZQQGSA-N",
+                "identifier": "MSBNK-AAFC-AC000114",
+                "name": "Deoxynivalenol",
+                "url": "https://massbank.eu/MassBank/RecordDisplay?id=MSBNK-AAFC-AC000114",
+                "inChI": "InChI=1S/C15H20O6/c1-7-3-9-14(5-16,11(19)10(7)18)13(2)4-8(17)12(21-9)15(13)6-20-15/h3,8-9,11-12,16-17,19H,4-6H2,1-2H3/t8-,9-,11-,12-,13-,14-,15+/m1/s1",
+                "smiles": "CC1=C[C@@H]2[C@]([C@@H](C1=O)O)([C@]3(C[C@H]([C@H]([C@@]34CO4)O2)O)C)CO",
+                "molecularFormula": "C15H20O6",
+                "monoisotopicMolecularWeight": 296.12598,
+                "inChIKey": "LINOMUASTDIRTM-QGRHZQQGSA-N"
+            }
+        ],
+        "subjectOf":
+        {
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            "@id": "https://massbank.eu/MassBank/RecordDisplay?id=MSBNK-AAFC-AC000114#Dataset"
         }
     }
 ]
